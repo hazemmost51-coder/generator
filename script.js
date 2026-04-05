@@ -4,7 +4,7 @@ let generators = JSON.parse(localStorage.getItem("generatorData")) || [];
 const modal = document.getElementById("modal");
 const genForm = document.getElementById("genForm");
 const list = document.getElementById("generatorsList");
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxpOKa1ioKdlzuJc40tjnD0aeOQ-LTbQJiddr2tYPDRiTRY7KnqUKODIlLISGYzeW9O/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyXfgxTxJCSP0xeOdfhqAizindmYfrW2dVjeVvZGxY96WlTN_qE7DDNq9fekcrv0Vo/exec";
 
 // استدعاء البيانات عند التشغيل
 fetchFromSheets();
@@ -161,3 +161,19 @@ document.getElementById("exportBtn").onclick = function() {
         XLSX.writeFile(wb, "تقرير_تشغيل_المولدات.xlsx");
     } catch (e) { alert("تأكد من وجود مكتبة XLSX."); }
 };
+// دالة الإضافة لجوجل شيت في كود الـ JavaScript
+async function addToSheets(genData) {
+    try {
+        await fetch(SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors", // لحل مشاكل الحماية في المتصفحات
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(genData)
+        });
+        console.log("تم الإرسال بنجاح");
+    } catch (error) {
+        console.error("فشل الإرسال:", error);
+    }
+}

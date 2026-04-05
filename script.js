@@ -1,66 +1,62 @@
-// 1. تعريف المصفوفة مرة واحدة فقط (تم دمج التعريفين)
-let generators = JSON.parse(localStorage.getItem("generatorData")) || []; 
+// 1. تعريف الرابط والمصفوفة
+const SCRIPT_URL = "ضع_رابط_الويب_آب_هنا"; 
+let generators = [];
 
 const modal = document.getElementById("modal");
 const genForm = document.getElementById("genForm");
 const list = document.getElementById("generatorsList");
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyXfgxTxJCSP0xeOdfhqAizindmYfrW2dVjeVvZGxY96WlTN_qE7DDNq9fekcrv0Vo/exec";
 
-// استدعاء البيانات عند التشغيل
+// جلب البيانات فور تشغيل الصفحة
 fetchFromSheets();
 
-// دالة حفظ البيانات في LocalStorage
-function saveToLocalStorage() {
-    localStorage.setItem("generatorData", JSON.stringify(generators));
-}
-
-// 2. دالة جلب البيانات من Google Sheets (تصحيح: لا تعيد تعريف المصفوفة، بل تحدد قيمتها)
 async function fetchFromSheets() {
     try {
         const response = await fetch(SCRIPT_URL);
         const data = await response.json();
-        if (data && data.length > 0) {
-            generators = data;
-            renderCards();
-            saveToLocalStorage();
-        }
+        // دمج البيانات القادمة مع الذاكرة المحلية أو استبدالها
+        generators = data;
+        renderCards();
     } catch (error) {
-        console.error("خطأ في جلب البيانات من جوجل:", error);
-        renderCards(); // سيعرض البيانات الموجودة أصلاً في المصفوفة (من الذاكرة المحلية)
+        console.error("فشل الجلب من جوجل، تحميل البيانات المحلية...");
+        generators = JSON.parse(localStorage.getItem("generatorData")) || [];
+        renderCards();
     }
 }
 
-// 3. دالة حساب الساعات (تأكد أنها تعمل بشكل صحيح)
+function saveToLocalStorage() {
+    localStorage.setItem("generatorData", JSON.stringify(generators));
+}
+
+// حساب فرق الساعات
 function calculateOperatingHours(feedDate, startTime, removeDate, stopTime) {
     if (!feedDate || !startTime || !removeDate || !stopTime) return "0";
     const startDateTime = new Date(`${feedDate}T${startTime}`);
     const endDateTime = new Date(`${removeDate}T${stopTime}`);
     const diffInMs = endDateTime - startDateTime; 
-    if (diffInMs <= 0) return "0 (خطأ في الوقت)";
+    if (diffInMs <= 0) return "0 (خطأ)";
     return (diffInMs / (1000 * 60 * 60)).toFixed(2); 
 }
 
-// 4. دالة الحفظ الموحدة (إضافة/تعديل + جوجل شيت + ذاكرة محلية)
+// حفظ البيانات (إضافة أو تعديل)
 genForm.onsubmit = async function(e) {
     e.preventDefault();
     
     const editIndex = document.getElementById("editIndex").value;
     const genData = {
-    office: document.getElementById("office").value,
-    reportNo: document.getElementById("reportNo").value,
-    feedDate: String(document.getElementById("feedDate").value), // التأكد من تحويلها لنص
-    feedTask: document.getElementById("feedTask").value,
-    removeDate: String(document.getElementById("removeDate").value),
-    removeTask: document.getElementById("removeTask").value,
-    faultType: document.getElementById("faultType").value,
-    equipNo: document.getElementById("equipNo").value,
-    requestTime: String(document.getElementById("requestTime").value),
-    startTime: String(document.getElementById("startTime").value),
-    stopTime: String(document.getElementById("stopTime").value),
-    totalHours: genData.totalHours, // القيمة المحسوبة مسبقاً
-    genNo: document.getElementById("genNo").value,
-    notes: document.getElementById("notes").value,
-};
+        office: document.getElementById("office").value,
+        reportNo: document.getElementById("reportNo").value,
+        feedDate: document.getElementById("feedDate").value,
+        feedTask: document.getElementById("feedTask").value,
+        removeDate: document.getElementById("removeDate").value,
+        removeTask: document.getElementById("removeTask").value,
+        faultType: document.getElementById("faultType").value,
+        equipNo: document.getElementById("equipNo").value,
+        requestTime: document.getElementById("requestTime").value,
+        startTime: document.getElementById("startTime").value,
+        stopTime: document.getElementById("stopTime").value,
+        genNo: document.getElementById("genNo").value,
+        notes: document.getElementById("notes").value,
+    };
 
     genData.totalHours = calculateOperatingHours(
         genData.feedDate, genData.startTime, 
@@ -68,44 +64,83 @@ genForm.onsubmit = async function(e) {
     );
 
     if (editIndex === "-1") {
-        // حالة الإضافة الجديدة
+        // إرسال لجوجل شيت
         try {
-            // إرسال لجوجل شيت
             await fetch(SCRIPT_URL, {
                 method: "POST",
-                mode: 'no-cors', // مهم لتجنب مشاكل الـ CORS مع تطبيقات جوجل
+                mode: "no-cors", 
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(genData)
             });
-        } catch (error) {
-            console.warn("فشل الإرسال لجوجل، تم الحفظ محلياً");
+            generators.push(genData);
+        } catch (err) {
+            console.error("خطأ في الكتابة:", err);
+            generators.push(genData);
         }
-        generators.push(genData); 
     } else {
-        // حالة التعديل
         generators[editIndex] = genData; 
     }
 
     saveToLocalStorage();
-    renderCards();
     modal.style.display = "none";
     this.reset();
+    renderCards();
 };
 
-// 5. وظيفة عرض البطاقات (تعديل طفيف لضمان الحذف)
 function renderCards() {
     list.innerHTML = "";
     generators.forEach((gen, index) => {
         const card = document.createElement("div");
         card.className = "card";
-        card.style = "border: 1px solid #ccc; padding: 10px; margin: 10px; border-radius: 8px; background: #fff;";
+        card.style = "border: 1px solid #ccc; padding: 15px; margin: 10px; border-radius: 8px; background: #fff; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);";
+        
+        // استخدام المسميات البرمجية لضمان القراءة الصحيحة
         card.innerHTML = `
-            <h3>مكتب: ${gen.office} (مولد ${gen.genNo})</h3>
-            <p><strong>رقم البلاغ:</strong> ${gen.reportNo}</p>
-            <p><strong>العطل:</strong> ${gen.faultType}</p>
-            <p>ساعات التشغيل: <strong>${gen.totalHours} ساعة</strong></p>
-            <button onclick="editGenerator(${index})" class="edit-btn">تعديل البيانات</button>
+            <h3 style="margin-top:0;">مكتب: ${gen.office || "بدون اسم"} (مولد ${gen.genNo || "-"})</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; font-size: 0.9em;">
+                <p><strong>رقم البلاغ:</strong> ${gen.reportNo || "-"}</p>
+                <p><strong>العطل:</strong> ${gen.faultType || "-"}</p>
+                <p><strong>التشغيل:</strong> ${gen.startTime || "-"}</p>
+                <p><strong>الإيقاف:</strong> ${gen.stopTime || "-"}</p>
+                <p><strong>التاريخ:</strong> ${gen.feedDate || "-"}</p>
+                <p><strong>الساعات:</strong> <span style="color:blue">${gen.totalHours || "0"}</span></p>
+            </div>
+            <button onclick="editGenerator(${index})" style="margin-top:10px; cursor:pointer;">تعديل</button>
         `;
         list.appendChild(card);
+    });
+}
+
+// نافذة الإضافة
+document.getElementById("addBtn").onclick = () => {
+    genForm.reset();
+    document.getElementById("editIndex").value = "-1"; 
+    document.getElementById("modalTitle").innerText = "إضافة مولد جديد";
+    modal.style.display = "block";
+};
+
+document.querySelector(".close").onclick = () => modal.style.display = "none";
+
+window.editGenerator = (index) => {
+    const gen = generators[index];
+    // تعبئة الحقول... (نفس كود التعديل السابق)
+    Object.keys(gen).forEach(key => {
+        const input = document.getElementById(key);
+        if(input) input.value = gen[key];
+    });
+    document.getElementById("editIndex").value = index; 
+    document.getElementById("modalTitle").innerText = "تعديل البيانات";
+    modal.style.display = "block";
+};
+
+// تصدير الإكسيل (بقِيَ كما هو)
+document.getElementById("exportBtn").onclick = function() {
+    if (generators.length === 0) return alert("لا توجد بيانات!");
+    const ws = XLSX.utils.json_to_sheet(generators);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "البيانات");
+    XLSX.writeFile(wb, "تقرير_المولدات.xlsx");
+};
     });
 }
 

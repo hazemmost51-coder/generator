@@ -1,5 +1,5 @@
 // 1. تعريف الرابط والمصفوفة
-const SCRIPT_URL = "ضع_رابط_الويب_آب_هنا"; 
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyVVKb90qtCehzJiWvQC7jCNNAeP-Cb09aPPfmJy6IAkyNS-TGvtD3G2LrXzwaey-Q/exec"; 
 let generators = [];
 
 const modal = document.getElementById("modal");

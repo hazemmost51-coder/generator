@@ -4,7 +4,7 @@ let generators = JSON.parse(localStorage.getItem("generatorData")) || [];
 const modal = document.getElementById("modal");
 const genForm = document.getElementById("genForm");
 const list = document.getElementById("generatorsList");
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyyQXkdjnlkmcy4dc-pKsRArYCp2vuPWmfgHvnR-yBgmcTAbN_1RREgFZ9mEIVYwDTM/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbySYEiPbnqih7qaNGP1dgh55Y8FutDjvwgLddj4IZEx4Ppo_0O97TRU6nNZ8vKWCA_h/exec";
 
 // استدعاء البيانات عند التشغيل
 fetchFromSheets();
@@ -46,20 +46,21 @@ genForm.onsubmit = async function(e) {
     
     const editIndex = document.getElementById("editIndex").value;
     const genData = {
-        office: document.getElementById("office").value,
-        reportNo: document.getElementById("reportNo").value,
-        feedDate: document.getElementById("feedDate").value,
-        feedTask: document.getElementById("feedTask").value,
-        removeDate: document.getElementById("removeDate").value,
-        removeTask: document.getElementById("removeTask").value,
-        faultType: document.getElementById("faultType").value,
-        equipNo: document.getElementById("equipNo").value,
-        requestTime: document.getElementById("requestTime").value,
-        startTime: document.getElementById("startTime").value,
-        stopTime: document.getElementById("stopTime").value,
-        genNo: document.getElementById("genNo").value,
-        notes: document.getElementById("notes").value,
-    };
+    office: document.getElementById("office").value,
+    reportNo: document.getElementById("reportNo").value,
+    feedDate: String(document.getElementById("feedDate").value), // التأكد من تحويلها لنص
+    feedTask: document.getElementById("feedTask").value,
+    removeDate: String(document.getElementById("removeDate").value),
+    removeTask: document.getElementById("removeTask").value,
+    faultType: document.getElementById("faultType").value,
+    equipNo: document.getElementById("equipNo").value,
+    requestTime: String(document.getElementById("requestTime").value),
+    startTime: String(document.getElementById("startTime").value),
+    stopTime: String(document.getElementById("stopTime").value),
+    totalHours: genData.totalHours, // القيمة المحسوبة مسبقاً
+    genNo: document.getElementById("genNo").value,
+    notes: document.getElementById("notes").value,
+};
 
     genData.totalHours = calculateOperatingHours(
         genData.feedDate, genData.startTime, 

@@ -4,7 +4,7 @@ let generators = JSON.parse(localStorage.getItem("generatorData")) || [];
 const modal = document.getElementById("modal");
 const genForm = document.getElementById("genForm");
 const list = document.getElementById("generatorsList");
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbySYEiPbnqih7qaNGP1dgh55Y8FutDjvwgLddj4IZEx4Ppo_0O97TRU6nNZ8vKWCA_h/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxpOKa1ioKdlzuJc40tjnD0aeOQ-LTbQJiddr2tYPDRiTRY7KnqUKODIlLISGYzeW9O/exec";
 
 // استدعاء البيانات عند التشغيل
 fetchFromSheets();

@@ -132,3 +132,35 @@ window.editGenerator = (index) => {
     document.getElementById("modalTitle").innerText = "تعديل بيانات المولد";
     modal.style.display = "block";
 };
+// وظيفة استخراج البيانات إلى ملف إكسيل
+document.getElementById("exportBtn").onclick = function() {
+    if (generators.length === 0) {
+        alert("لا توجد بيانات لتصديرها!");
+        return;
+    }
+
+    // إنشاء ورقة عمل من البيانات
+    const worksheet = XLSX.utils.json_to_sheet(generators);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "المولدات");
+
+    // تحميل الملف باسم محدد
+    XLSX.writeFile(workbook, `تقرير_المولدات_${new Date().toLocaleDateString('ar-EG')}.xlsx`);
+};
+// وظيفة مسح جميع البيانات (بدء شهر جديد)
+document.getElementById("newMonthBtn").onclick = function() {
+    const confirmDelete = confirm("هل أنت متأكد من مسح جميع البيانات؟ لا يمكن التراجع عن هذه الخطوة.");
+    
+    if (confirmDelete) {
+        // مسح المصفوفة
+        generators = [];
+        
+        // مسح الذاكرة المحلية
+        localStorage.removeItem("generatorData");
+        
+        // تحديث الواجهة
+        renderCards();
+        
+        alert("تم مسح جميع البيانات بنجاح.");
+    }
+};

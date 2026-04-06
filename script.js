@@ -42,7 +42,6 @@ genForm.onsubmit = async function(e) {
     
     const editIndex = document.getElementById("editIndex").value;
     
-    // حساب الساعات قبل إنشاء الكائن
     const hours = calculateOperatingHours(
         document.getElementById("feedDate").value,
         document.getElementById("startTime").value,
@@ -67,14 +66,16 @@ genForm.onsubmit = async function(e) {
         totalHours: hours
     };
 
+    // إرسال البيانات لجوجل سواء كانت إضافة أو تعديل
+    // السكريبت سيبحث عن رقم البلاغ ويقرر (تحديث أم إضافة)
+    fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        body: JSON.stringify(genData)
+    });
+
     if (editIndex === "-1") {
         generators.push(genData);
-        // إرسال لجوجل
-        fetch(SCRIPT_URL, {
-            method: "POST",
-            mode: "no-cors",
-            body: JSON.stringify(genData)
-        });
     } else {
         generators[editIndex] = genData;
     }
@@ -84,6 +85,7 @@ genForm.onsubmit = async function(e) {
     modal.style.display = "none";
     genForm.reset();
 };
+
 
 function renderCards() {
     list.innerHTML = "";

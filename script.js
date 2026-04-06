@@ -147,8 +147,8 @@ document.getElementById("exportBtn").onclick = function() {
     // تحميل الملف باسم محدد
     XLSX.writeFile(workbook, `تقرير_المولدات_${new Date().toLocaleDateString('ar-EG')}.xlsx`);
 };
-// وظيفة مسح جميع البيانات (بدء شهر جديد)
-document.getElementById("newMonthBtn").onclick = function() {
+/* // وظيفة مسح جميع البيانات (بدء شهر جديد)
+//document.getElementById("newMonthBtn").onclick = function() {
     const confirmDelete = confirm("هل أنت متأكد من مسح جميع البيانات؟ لا يمكن التراجع عن هذه الخطوة.");
     
     if (confirmDelete) {
@@ -163,4 +163,4 @@ document.getElementById("newMonthBtn").onclick = function() {
         
         alert("تم مسح جميع البيانات بنجاح.");
     }
-};
+}; */

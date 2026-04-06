@@ -6,7 +6,7 @@ const modal = document.getElementById("modal");
 const genForm = document.getElementById("genForm");
 const list = document.getElementById("generatorsList");
 
-// تشغيل الجلب فور فتح الصفحة
+// تشغيل الجلب/ فور فتح الصفحة
 fetchFromSheets();
 
 async function fetchFromSheets() {

@@ -1,4 +1,4 @@
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxT4uVio1SsB94noEPl5DdOWFKe7W5fgq-JhT42tbmuATxNPOVGWoiyBSmydqYSU7ql/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyMGFcqXpNvo0pPHgo3bY45Q1-Oxf6w84SvHl2hwar4r8-8rQPxxkb9Cdp5B47eNVo5/exec";
 
 let generators = JSON.parse(localStorage.getItem("generatorData")) || [];
 

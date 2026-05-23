@@ -28,24 +28,33 @@ function saveToLocalStorage() {
     localStorage.setItem("generatorData", JSON.stringify(generators));
 }
 
-function calculateOperatingHours(feedDate, startTime, removeDate, stopTime) {
-    if (!feedDate || !startTime || !removeDate || !stopTime) return "0";
-    const start = new Date(`${feedDate}T${startTime}`);
-    const end = new Date(`${removeDate}T${stopTime}`);
-    const diff = end - start;
-    if (diff <= 0) return "0 (خطأ)";
-    return (diff / (1000 * 60 * 60)).toFixed(2);
+function calculateOperatingHours(startTime, stopTime) {
+    if (startTime === undefined || startTime === null || stopTime === undefined || stopTime === null) return "0";
+    
+    const start = parseFloat(startTime);
+    const stop = parseFloat(stopTime);
+    
+    if (isNaN(start) || isNaN(stop)) return "0";
+
+    let diff = stop - start;
+
+    // معالجة حالة تخطي منتصف الليل (إذا كان وقت النهاية أصغر من وقت البداية)
+    if (diff < 0) {
+        diff += 24; 
+    }
+
+    return diff.toFixed(2);
 }
 
+// 2. حدث إرسال النموذج بعد تعديل استدعاء الدالة
 genForm.onsubmit = async function(e) {
     e.preventDefault();
     
     const editIndex = document.getElementById("editIndex").value;
     
+    // التعديل هنا: نمرر فقط وقت البداية ووقت النهاية للدالة الجديدة
     const hours = calculateOperatingHours(
-        document.getElementById("feedDate").value,
         document.getElementById("startTime").value,
-        document.getElementById("removeDate").value,
         document.getElementById("stopTime").value
     );
 
@@ -63,7 +72,7 @@ genForm.onsubmit = async function(e) {
         stopTime: document.getElementById("stopTime").value,
         genNo: document.getElementById("genNo").value,
         notes: document.getElementById("notes").value,
-        totalHours: hours
+        totalHours: hours // سيتم تخزين الناتج العشري هنا
     };
 
     // إرسال البيانات لجوجل سواء كانت إضافة أو تعديل

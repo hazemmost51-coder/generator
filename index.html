@@ -15,8 +15,7 @@
         <button id="exportBtn" class="export-btn">استخراج إكسيل (Excel) 📊</button>
         <button id="newMonthBtn" class="export-btn" style="background-color: red; color: white;">بدء شهر جديد (مسح الكل)</button>
 
-        <div id="generatorsList" class="cards-grid">
-            </div>
+        <div id="generatorsList" class="cards-grid"></div>
     </div>
 
     <div id="modal" class="modal">
@@ -24,7 +23,8 @@
             <span class="close">&times;</span>
             <h2 id="modalTitle">إدخال بيانات المولد</h2>
             <form id="genForm">
-                <input type="hidden" id="editIndex"> <div class="form-grid">
+                <input type="hidden" id="editIndex"> 
+                <div class="form-grid">
                     <div class="field"><label>اسم المكتب:</label><input type="text" id="office" required></div>
                     <div class="field"><label>رقم البلاغ:</label><input type="text" id="reportNo" required></div>
                     <div class="field"><label>تاريخ التغذية:</label><input type="date" id="feedDate"></div>
@@ -34,9 +34,25 @@
                     <div class="field"><label>نوع العطل:</label><input type="text" id="faultType"></div>
                     <div class="field"><label>رقم المعدة:</label><input type="text" id="equipNo"></div>
                     <div class="field"><label>وقت الطلب:</label><input type="time" id="requestTime"></div>
-                    <div class="field"><label>وقت التشغيل:</label><input  id="startTime"></div>
-                    <div class="field"><label>وقت الفصل:</label><input  id="stopTime"></div>
-                    <div class="field"><label>رقم المولد:</label><input type="text" id="genNo"></div>
+                    
+                    <div class="field">
+                        <label>رقم المولد:</label>
+                        <select id="genNo" onchange="toggleInputTypes()">
+                            <option value="220">220</option>
+                            <option value="400-1">400-1</option>
+                            <option value="400-2">400-2</option>
+                        </select>
+                    </div> 
+
+                    <div class="field">
+                        <label id="startLabel">عداد التشغيل:</label>
+                        <input id="startTime" required>
+                    </div> 
+                    <div class="field">
+                        <label id="stopLabel">عداد الفصل:</label>
+                        <input id="stopTime" required>
+                    </div> 
+
                     <div class="field full-width"><label>الملاحظات:</label><textarea id="notes"></textarea></div>
                 </div>
                 <button type="submit" id="saveBtn" class="save-btn">حفظ البيانات</button>

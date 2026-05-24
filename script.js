@@ -177,7 +177,7 @@ function renderCards() {
         card.innerHTML = `
             <h3>مكتب: ${gen.office} (مـولـد ${gen.genNo})</h3>
             <p><strong>رقم البلاغ:</strong> ${gen.reportNo}</p>
-            <p>صافي مدة التشغيل: <strong>${unitText}</strong></p>
+            <p>صافي مدة التشغيل: <strong>${gen.totalHours}</strong></p>
             <button onclick="editGenerator(${index})" class="edit-btn">تعديل البيانات</button>
         `;
         list.appendChild(card);

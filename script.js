@@ -143,17 +143,26 @@ genForm.onsubmit = async function(e) {
         stopTime: stopTimeVal,
         genNo: genNo,
         notes: document.getElementById("notes").value,
-        totalHours: hours // سيتم حفظها إما كـ رقم عشري أو بصيغة (ساعات:دقائق) حسب نوع المولد
+        totalHours: hours
     };
 
+    // البيانات المجهزة للإرسال إلى جوجل شيت (نضيف علامة اقتباس ' لإجبار جوجل على حفظها كنص)
+    const dataForSheets = { ...genData };
+    if (genNo !== "220") {
+        dataForSheets.startTime = "'" + startTimeVal;
+        dataForSheets.stopTime = "'" + stopTimeVal;
+        dataForSheets.totalHours = "'" + hours;
+    }
+    
+    // إرسال البيانات المحمية لجوجل شيت
     fetch(SCRIPT_URL, {
         method: "POST",
         mode: "no-cors",
-        body: JSON.stringify(genData)
+        body: JSON.stringify(dataForSheets) // نرسل النسخة المحمية هنا
     });
 
     if (editIndex === "-1") {
-        generators.push(genData);
+        generators.push(genData); // نحفظ النسخة النظيفة محلياً
     } else {
         generators[editIndex] = genData;
     }
@@ -210,8 +219,19 @@ window.editGenerator = (index) => {
     
     toggleInputTypes();
     
-    document.getElementById("startTime").value = gen.startTime || "";
-    document.getElementById("stopTime").value = gen.stopTime || "";
+    // دالة لتنظيف النص لو جاء مشوه بصيغة الوقت القديمة من السيتس
+    function cleanTimeValue(val) {
+        if (!val) return "";
+        if (String(val).includes("T") && String(val).includes("Z")) {
+            // استخراج الساعات والدقائق فقط من الصيغة المشوهة المشابهة للصورة لإنقاذ الموقف
+            const parts = String(val).split("T")[1].split(":");
+            return `${parseInt(parts[0])}:${parts[1]}`;
+        }
+        return String(val).replace(/'/g, ""); // حذف علامة الاقتباس الحامية لو وجدت أثناء ملء الحقول
+    }
+    
+    document.getElementById("startTime").value = gen.genNo === "220" ? (gen.startTime || "") : cleanTimeValue(gen.startTime);
+    document.getElementById("stopTime").value = gen.genNo === "220" ? (gen.stopTime || "") : cleanTimeValue(gen.stopTime);
     document.getElementById("notes").value = gen.notes;
     document.getElementById("editIndex").value = index;
     document.getElementById("modalTitle").innerText = "تعديل بيانات المولد";
